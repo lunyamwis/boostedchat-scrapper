@@ -4,7 +4,7 @@ name: Push to Holding Repo for dev branch
 # Whenever this file is updated, ensure that is is also updated in all the microservice repos
 # For now this can still be done manually
 env:
-  SERVICE_NAME: "web" # change this for each service
+  SERVICE_NAME: "airflow-web" # change this for each service
   REPO_NAME: "create-boostedchat-instance"
   # BRANCH: "dev"
   LOCAL_BRANCH: "dev"
@@ -102,4 +102,4 @@ jobs:
             fi
 
 
-## for triggering
+## for triggering. 31
