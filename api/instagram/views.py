@@ -312,7 +312,8 @@ class GetAccounts(APIView):
                         "comment": user.info.get("media_comment"),
                         "usernames_to": user.info.get("username"),
                         "username": user.info.get("username"),
-                        "username_from": resp.json()['salesrep'].get('username','')
+                        "username_from": resp.json()['salesrep'].get('username',''),
+                        "outsourced_info":user.info
                     }
                     datasets.append(dataset)
         
