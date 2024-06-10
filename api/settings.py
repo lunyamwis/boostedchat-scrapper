@@ -202,4 +202,4 @@ CORS_ALLOW_METHODS = (
     "PUT",
 )
 
-AI_MICROSERVICE_URL = "http://34.170.152.34/modelhub/"
+AI_MICROSERVICE_URL = f"http://{os.getenv('AI_MICROSERVICE_URL')}/modelhub/"
