@@ -238,7 +238,7 @@ class GetMediaIds(APIView):
         chain = request.data.get("chain")
         
         datasets = []
-        for user in InstagramUser.objects.filter(Q(round=round_) & Q(qualified=True)):
+        for user in InstagramUser.objects.filter(Q(round=round_)):
             resp = requests.post(f"https://api.{os.environ.get('DOMAIN1', '')}.boostedchat.com/v1/instagram/has-client-responded/",data={"username":user.username})
             print(resp.status_code)
             if resp.status_code == 200:
@@ -267,7 +267,7 @@ class GetMediaComments(APIView):
         chain = request.data.get("chain")
         
         datasets = []
-        for user in InstagramUser.objects.filter(Q(round=round_) & Q(qualified=True)):
+        for user in InstagramUser.objects.filter(Q(round=round_)):
             resp = requests.post(f"https://api.{os.environ.get('DOMAIN1', '')}.boostedchat.com/v1/instagram/has-client-responded/",data={"username":user.username})
             print(resp.status_code)
             if resp.status_code == 200:
