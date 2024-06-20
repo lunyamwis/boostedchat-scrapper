@@ -25,6 +25,7 @@ urlpatterns = [
     path('insertAndEnrich/', views.InsertAndEnrich.as_view()),
     path('getMediaIds/',views.GetMediaIds.as_view()),
     path('getMediaComments/',views.GetMediaComments.as_view()),
-    path('getAccounts/',views.GetAccounts.as_view())
+    path('getAccounts/',views.GetAccounts.as_view()),
+    path('getAccount/',views.GetAccount.as_view())
 ]
 

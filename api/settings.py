@@ -40,13 +40,18 @@ ALLOWED_HOSTS = [
     "booksy.us.boostedchat.com",
     "scrapper.booksy.boostedchat.com",
     "airflow.booksy.boostedchat.com",
+    "0b1a-104-199-39-159.ngrok-free.app",
+    "8000-lunyamwis-boostedchatsc-0r341q3hu0e.ws-eu114.gitpod.io"
 ]
 CSRF_TRUSTED_ORIGINS = [
     f"https://api.{os.environ.get('DOMAIN1', '')}.boostedchat.com",
     f"https://api.{os.environ.get('DOMAIN2', '')}.boostedchat.com",
     f"https://scrapper.{os.environ.get('DOMAIN1', '')}.boostedchat.com",
     f"https://scrapper.{os.environ.get('DOMAIN2', '')}.boostedchat.com",
-    "http://34.28.104.255"]
+    "http://34.28.104.255",
+    "https://0b1a-104-199-39-159.ngrok-free.app",  
+    "https://8000-lunyamwis-boostedchatsc-0r341q3hu0e.ws-eu114.gitpod.io/"  
+]
 
 # Application definition
 

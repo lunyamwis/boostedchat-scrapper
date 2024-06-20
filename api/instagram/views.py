@@ -14,7 +14,7 @@ from django.shortcuts import get_object_or_404
 from .tasks import scrap_followers,scrap_info,scrap_users,insert_and_enrich,scrap_mbo
 from api.helpers.dag_generator import generate_dag
 from api.helpers.date_helper import datetime_to_cron_expression
-from boostedchatScrapper.spiders.helpers.thecut_helper import scrap_the_cut
+from boostedchatScrapper.spiders.helpers.thecut_scrapper import scrap_the_cut
 from django.db.models import Q
 from .models import InstagramUser
 
@@ -69,12 +69,14 @@ class ScrapTheCut(APIView):
 
     def post(self,request):
         chain = request.data.get("chain")
-        round_ = request.data.get("round")
-        index = request.data.get("index")
+        round_ = int(request.data.get("round"))
+        index = int(request.data.get("index"))
         record = request.data.get("record", None)
         refresh = request.data.get("refresh", False)
-        number_of_leads = request.data.get("number_of_leads",0)
+        number_of_leads = int(request.data.get("number_of_leads",0))
+        # print(chain,round_)
         try:
+            # import pdb;pdb.set_trace()
             users = None
             if refresh:
                 scrap_the_cut(round_number=round_)
@@ -85,17 +87,15 @@ class ScrapTheCut(APIView):
             else:
                 users = ScrappedData.objects.filter(round_number=round_)
 
+            dataset = [] # build the dataset
             if users.exists():
-                if chain:
-                    for user in users:
-                        scrap_users(list(user.response.get("keywords")[1]),round_ = round_,index=index)
-                else:
-                    for user in users:
-                        scrap_users.delay(list(user.response.get("keywords")[1]),round_ = round_,index=index)
-
-                return Response({"success": True}, status=status.HTTP_200_OK)
+                for user in users:
+                    dataset.append(user.response)
+                
+                return Response({"dataset": dataset}, status=status.HTTP_200_OK)
             else:
                 logging.warning("Unable to find user")
+                return Response({"error":"users do not exist"},status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
@@ -301,7 +301,43 @@ class GetMediaComments(APIView):
             return Response({"data": datasets},status=status.HTTP_200_OK)
         else:
             return Response({"error":"There is an error fetching medias"}, status=400)
+
+
+class GetAccount(APIView):
+    def post(self,request):
+        round_ = request.data.get("round")
+        chain = request.data.get("chain")
+        username = request.data.get("username")
         
+        datasets = []
+        for user in InstagramUser.objects.filter(Q(round=round_) & Q(username=username)):
+            resp = requests.post(f"https://api.{os.environ.get('DOMAIN1', '')}.boostedchat.com/v1/instagram/has-client-responded/",data={"username":user.username})
+            print(resp.status_code)
+            if resp.status_code == 200:
+                if resp.json()['has_responded']:
+                    return Response({"message":"No need to carry on further because client has responded"}, status=status.HTTP_200_OK)
+            else:
+                resp = requests.get(f"https://api.{os.environ.get('DOMAIN1', '')}.boostedchat.com/v1/instagram/account/retrieve-salesrep/{user.username}/")
+                if resp.status_code == 200:
+                    print(resp.json())
+                    dataset = {
+                        "mediaId": user.info.get("media_id"),
+                        "comment": user.info.get("media_comment"),
+                        "usernames_to": user.info.get("username"),
+                        "username": user.info.get("username"),
+                        "username_from": resp.json()['salesrep'].get('username',''),
+                        "outsourced_info":user.info
+                    }
+                    datasets.append(dataset)
+        
+        
+        if chain and round_:  
+            return Response({"data": datasets},status=status.HTTP_200_OK)
+        else:
+            return Response({"error":"There is an error fetching medias"}, status=400)
+        
+
+
 class GetAccounts(APIView):
     def post(self,request):
         round_ = request.data.get("round")
